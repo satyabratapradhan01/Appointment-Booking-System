@@ -1,8 +1,11 @@
 import express from "express";
-import {registerUser, loginUser} from "../controllers/userController.js"
+import authMiddleware from "../middleware/authMiddleware.js";
+import authorizeRoles from "../middleware/authorizeRoles.js";
+
 const userRouter = express.Router();
 
-userRouter.use("/register", registerUser);
-userRouter.use("/login", loginUser);
+userRouter.post("/appointments", authMiddleware, authorizeRoles("USER"), (req, res) => {
+    return res.status(200).json({success: true, message: "hello user..."});
+})
 
 export default userRouter;
