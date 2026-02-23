@@ -1,5 +1,5 @@
 
-import userModel from "../model/userModel.js";
+import User from "../model/userModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -11,7 +11,7 @@ const registerUser = async (req, res) => {
   try {
     const { name, email, password, role } = req.validatorData;
 
-    const exit = await userModel.findOne({ email });
+    const exit = await User.findOne({ email });
     if (exit) {
       return res.json({ success: false, message: "user is alredy exit." });
     }
@@ -26,7 +26,7 @@ const registerUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(password, salt);
 
-    const newUser = await userModel({
+    const newUser = new User({
       name,
       email,
       passwordHash: hashPassword,
@@ -35,7 +35,7 @@ const registerUser = async (req, res) => {
 
     const user = await newUser.save();
     const token = createToken(user._id, user.role);
-    return res.json({ success: true, token });
+    return res.json({ success: true, token, message: `User created Successfully with id ${user._id}` });
   } catch (error) {
     console.log(error);
     return res.json({ success: false, message: error.message });
@@ -46,7 +46,7 @@ const loginUser = async (req, res) => {
   try {
     const { email, password } = req.validatorData;
 
-    const user = await userModel.findOne({ email });
+    const user = await User.findOne({ email });
     if (!user) {
       return res.json({ success: false, message: "email not exit" });
     }

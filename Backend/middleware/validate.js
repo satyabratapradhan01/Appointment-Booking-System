@@ -1,4 +1,3 @@
-import { success } from "zod";
 
 export const validator = (schema) => (req, res, next) => {
     const result = schema.safeParse(req.body);
@@ -8,5 +7,5 @@ export const validator = (schema) => (req, res, next) => {
     }
 
     req.validatorData = result.data;
-    next();
+    next(); 
 };
