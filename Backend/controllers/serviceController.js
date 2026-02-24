@@ -1,6 +1,5 @@
 import Service from "../model/serviceModel.js";
 import Availability from "../model/availabilityModel.js";
-import { success } from "zod";
 
 const createService = async (req, res) => {
   try {
@@ -79,14 +78,32 @@ const setAvailability = async (req, res) => {
 };
 
 const getServices = async (req, res) => {
-  const type = req.query.type
+  try {
+    const type = req.query.type
   const validTypes = ["MEDICAL","HOUSE_HELP","BEAUTY","FITNESS","EDUCATION","OTHER"];
-  if(!validTypes.includes(type)){
-    return res.status(400).json({success: false, message: " Invalid service type"});
+  if(type && !validTypes.includes(type)){
+    return res.status(400).json({success: false, message: "Invalid service type"});
   }
-  const services = await Service.find({type})
-  console.log(services._id);
-  // return res.status(200).json({id: services.name, message: "hello"})
+
+  const filter = {};
+  if(type){
+    filter.type = type;
+  }
+
+  const services = await Service.find(filter).populate("providerId", "name");
+
+  const result = services.map(service => ({
+    id: service._id,
+    name: service.name,
+    type: service.type,
+    durationMinutes: service.durationMinutes,
+    providerName: service.providerId.name
+  }))
+  return res.status(200).json(result)
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({success: false, message: "Invalid service type"});
+  }
 }
 
 export { createService, setAvailability, getServices};

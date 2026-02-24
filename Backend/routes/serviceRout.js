@@ -12,7 +12,7 @@ const serviceRouter = express.Router();
 
 serviceRouter.post("/services", authMiddleware, authorizeRoles("SERVICE_PROVIDER"), validator(createServiceSchema), createService );
 serviceRouter.post("/services/:serviceId/availability", authMiddleware, authorizeRoles("SERVICE_PROVIDER"), validator(setAvailabilitySchema), setAvailability );
-serviceRouter.get("/services", authMiddleware, authorizeRoles("SERVICE_PROVIDER"), getServices );
+serviceRouter.get("/services", getServices );
 
 
 export default serviceRouter
